@@ -288,70 +288,14 @@ applyCursorGlow();
 
 const modal = document.getElementById('resume-modal');
 if (modal) {
-  const canvas = modal.querySelector('#resume-canvas');
-  const frame = modal.querySelector('.resume-frame');
-  let pdfDoc = null;
-  let rendering = false;
-
-  const renderResume = async () => {
-    if (!canvas || !frame || !window.pdfjsLib || rendering) return;
-    rendering = true;
-
-    try {
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-      pdfDoc = pdfDoc || await pdfjsLib.getDocument(
-        'ATS_Jishin_Bijumon_George_Resume_SinglePage.pdf'
-      ).promise;
-
-      const page = await pdfDoc.getPage(1);
-      const baseViewport = page.getViewport({ scale: 1 });
-
-      // Fill the popup's entire width. If the resulting page is taller
-      // than the popup, .resume-frame provides vertical scrolling.
-      const scale = Math.max((frame.clientWidth - 2) / baseViewport.width, 0.1);
-      const viewport = page.getViewport({ scale });
-      const ratio = window.devicePixelRatio || 1;
-
-      canvas.width = Math.ceil(viewport.width * ratio);
-      canvas.height = Math.ceil(viewport.height * ratio);
-      canvas.style.width = Math.ceil(viewport.width) + 'px';
-      canvas.style.height = Math.ceil(viewport.height) + 'px';
-
-      const context = canvas.getContext('2d', { alpha: false });
-      context.fillStyle = '#ffffff';
-      context.fillRect(0, 0, canvas.width, canvas.height);
-
-      await page.render({
-        canvasContext: context,
-        viewport,
-        transform: ratio !== 1 ? [ratio, 0, 0, ratio, 0, 0] : null
-      }).promise;
-    } catch (error) {
-      console.error('Resume render failed:', error);
-    } finally {
-      rendering = false;
-    }
-  };
-
   document.querySelectorAll('[data-resume]').forEach((button) => {
-    button.addEventListener('click', () => {
-      modal.showModal();
-      setTimeout(renderResume, 80);
-    });
+    button.addEventListener('click', () => modal.showModal());
   });
 
   modal.querySelector('.close')?.addEventListener('click', () => modal.close());
 
   modal.addEventListener('click', (event) => {
     if (event.target === modal) modal.close();
-  });
-
-  window.addEventListener('resize', () => {
-    if (modal.open) {
-      setTimeout(renderResume, 80);
-    }
   });
 }
 
