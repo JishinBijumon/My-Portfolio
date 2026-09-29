@@ -1402,15 +1402,7 @@ if (modal) {
       modal.close();
     }
   });
-  const resumeFrame = modal.querySelector('.resume-frame');
-  if (resumeFrame && !resumeFrame.querySelector('.resume-page-two')) {
-    const pageTwo = document.createElement('img');
-    pageTwo.className = 'resume-page-two';
-    pageTwo.src = 'resume-preview-page-2.png';
-    pageTwo.alt = 'Resume preview - page 2';
-    pageTwo.loading = 'lazy';
-    resumeFrame.appendChild(pageTwo);
-  }
+
 }
 
 const nestDetailPanel = document.querySelector('#nest-modal .experience-detail-panel');
