@@ -348,7 +348,7 @@ if (nestTechPanel && !nestTechPanel.querySelector('.certificate-preview')) {
 
 const projectModal = document.getElementById('wheelchair-modal');
 const galleryLink = document.querySelector('.wheelchair-image');
-const projectImages = ['wheelchair-prototype.jpeg', 'wheelchair-electronics.jpeg', 'wheelchair-full.jpeg'];
+const projectImages = ['wheelchair-prototype.jpeg', 'wheelchair-electronics.jpeg', 'wheelchair-full.jpeg', 'wheelchair-smart.jpg', 'wheelchair-smart.png'];
 let imageIndex = 0;
 const cardImage = galleryLink?.querySelector('img');
 const modalImage = document.getElementById('modal-wheelchair-image');
@@ -369,7 +369,7 @@ if (galleryLink && projectModal) {
 
 const pcbVisual = document.querySelector('.visual.pcb');
 const pcbModal = document.getElementById('pcb-modal');
-const pcbImages = ['bci-pcb-3d.png'];
+const pcbImages = ['bci-pcb-3d.png', 'bci-pcb-layout.png', 'bci-pcb-schematic.png', 'bci-pcb-prototype-1.jpeg', 'bci-pcb-prototype-2.jpeg'];
 let pcbIndex = 0;
 const modalPcbImage = document.getElementById('modal-pcb-image');
 const pcbSlideCurrent = document.getElementById('pcb-slide-current');
