@@ -1,7 +1,63 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Resume</title><style>html,body{margin:0;width:100%;height:100%;background:#edf0ed;overflow:hidden}#viewer{width:100%;height:100%;overflow-y:auto;overflow-x:hidden;display:flex;justify-content:center;box-sizing:border-box}#page{display:block;width:100%;height:auto;background:#fff}</style></head>
-<body><div id="viewer"><canvas id="page"></canvas></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script>
-(async function(){const c=document.getElementById('page'),v=document.getElementById('viewer');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';const pdf=await pdfjsLib.getDocument('ATS_Jishin_Bijumon_George_Resume_SinglePage.pdf').promise;const p=await pdf.getPage(1);const b=p.getViewport({scale:1});const s=(v.clientWidth-2)/b.width;const vp=p.getViewport({scale:s}),r=window.devicePixelRatio||1;c.width=Math.ceil(vp.width*r);c.height=Math.ceil(vp.height*r);c.style.width=Math.ceil(vp.width)+'px';c.style.height=Math.ceil(vp.height)+'px';await p.render({canvasContext:c.getContext('2d'),viewport:vp,transform:[r,0,0,r,0,0]}).promise;})();</script></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resume</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#edf0ed;overflow:hidden}
+#viewer{width:100%;height:100%;overflow-y:auto;overflow-x:hidden;box-sizing:border-box}
+#page{display:block;width:100%;height:auto;background:#fff}
+#error{display:none;padding:24px;font:16px Arial,sans-serif;color:#222;background:#fff}
+</style>
+</head>
+<body>
+<div id="viewer">
+  <canvas id="page"></canvas>
+  <div id="error">Unable to display the resume. Please use the Download Resume button.</div>
+</div>
+<script type="module">
+import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs';
+
+const canvas=document.getElementById('page');
+const viewer=document.getElementById('viewer');
+const error=document.getElementById('error');
+
+async function renderResume(){
+  try{
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
+
+    const pdf=await pdfjsLib.getDocument({
+      url:new URL('ATS_Jishin_Bijumon_George_Resume_SinglePage.pdf',window.location.href).href
+    }).promise;
+
+    const page=await pdf.getPage(1);
+    const base=page.getViewport({scale:1});
+    const scale=viewer.clientWidth/base.width;
+    const viewport=page.getViewport({scale});
+    const ratio=window.devicePixelRatio||1;
+
+    canvas.width=Math.ceil(viewport.width*ratio);
+    canvas.height=Math.ceil(viewport.height*ratio);
+    canvas.style.width=Math.ceil(viewport.width)+'px';
+    canvas.style.height=Math.ceil(viewport.height)+'px';
+
+    await page.render({
+      canvasContext:canvas.getContext('2d',{alpha:false}),
+      viewport,
+      transform:[ratio,0,0,ratio,0,0]
+    }).promise;
+  }catch(e){
+    console.error('Resume viewer error:',e);
+    canvas.style.display='none';
+    error.style.display='block';
+  }
+}
+
+window.addEventListener('load',renderResume);
+window.addEventListener('resize',()=>{
+  if(document.visibilityState==='visible') renderResume();
+});
+</script>
+</body>
+</html>
