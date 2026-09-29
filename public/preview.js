@@ -288,14 +288,58 @@ applyCursorGlow();
 
 const modal = document.getElementById('resume-modal');
 if (modal) {
+  const canvas = modal.querySelector('#resume-canvas');
+  const frame = modal.querySelector('.resume-frame');
+  let pdfDoc = null;
+  let renderTask = null;
+
+  const renderResume = async () => {
+    if (!canvas || !frame || !window.pdfjsLib) return;
+    try {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      pdfDoc = pdfDoc || await pdfjsLib.getDocument('ATS_Jishin_Bijumon_George_Resume_SinglePage.pdf').promise;
+      const page = await pdfDoc.getPage(1);
+
+      const base = page.getViewport({ scale: 1 });
+      const availableWidth = Math.max(frame.clientWidth - 16, 1);
+      const availableHeight = Math.max(frame.clientHeight - 16, 1);
+      const scale = Math.min(availableWidth / base.width, availableHeight / base.height);
+      const viewport = page.getViewport({ scale });
+      const ratio = window.devicePixelRatio || 1;
+
+      if (renderTask) renderTask.cancel();
+
+      canvas.width = Math.ceil(viewport.width * ratio);
+      canvas.height = Math.ceil(viewport.height * ratio);
+      canvas.style.width = Math.ceil(viewport.width) + 'px';
+      canvas.style.height = Math.ceil(viewport.height) + 'px';
+
+      renderTask = page.render({
+        canvasContext: canvas.getContext('2d', { alpha: false }),
+        viewport,
+        transform: [ratio, 0, 0, ratio, 0, 0]
+      });
+      await renderTask.promise;
+    } catch (error) {
+      if (error?.name !== 'RenderingCancelledException') {
+        console.error('Resume render failed:', error);
+      }
+    }
+  };
+
   document.querySelectorAll('[data-resume]').forEach((button) => {
-    button.addEventListener('click', () => modal.showModal());
+    button.addEventListener('click', () => {
+      modal.showModal();
+      requestAnimationFrame(renderResume);
+    });
   });
 
   modal.querySelector('.close')?.addEventListener('click', () => modal.close());
-
   modal.addEventListener('click', (event) => {
     if (event.target === modal) modal.close();
+  });
+  window.addEventListener('resize', () => {
+    if (modal.open) requestAnimationFrame(renderResume);
   });
 }
 
