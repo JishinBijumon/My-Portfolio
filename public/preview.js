@@ -348,7 +348,7 @@ if (nestTechPanel && !nestTechPanel.querySelector('.certificate-preview')) {
 
 const projectModal = document.getElementById('wheelchair-modal');
 const galleryLink = document.querySelector('.wheelchair-image');
-const projectImages = ['wheelchair-prototype.jpeg', 'wheelchair-electronics.jpeg', 'wheelchair-full.jpeg', 'wheelchair-smart.jpg', 'wheelchair-smart.png'];
+const projectImages = ['wheelchair-prototype.jpeg', 'wheelchair-electronics.jpeg', 'wheelchair-full.jpeg'];
 let imageIndex = 0;
 const cardImage = galleryLink?.querySelector('img');
 const modalImage = document.getElementById('modal-wheelchair-image');
