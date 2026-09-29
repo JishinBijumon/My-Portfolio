@@ -288,73 +288,14 @@ applyCursorGlow();
 
 const modal = document.getElementById('resume-modal');
 if (modal) {
-  const resumePdfUrl = 'ATS_Jishin_Bijumon_George_Resume_SinglePage.pdf';
-  const resumeCanvas = modal.querySelector('#resume-canvas');
-  let resumePdf = null;
-  let resumePage = null;
-  let resumeLoading = null;
-  let resumeRenderTask = null;
-
-  const renderResume = async () => {
-    if (!resumeCanvas) return;
-    const frame = modal.querySelector('.resume-frame');
-    if (!frame) return;
-
-    if (!resumeLoading) {
-      resumeLoading = import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs').then((pdfjsLib) => {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
-        return pdfjsLib.getDocument(resumePdfUrl).promise;
-      });
-    }
-
-    try {
-      resumePdf = resumePdf || await resumeLoading;
-      resumePage = resumePage || await resumePdf.getPage(1);
-
-      const baseViewport = resumePage.getViewport({ scale: 1 });
-      const availableWidth = Math.max(frame.clientWidth - 20, 1);
-      const availableHeight = Math.max(frame.clientHeight - 20, 1);
-      const scale = Math.min(
-        availableWidth / baseViewport.width,
-        availableHeight / baseViewport.height
-      );
-      const viewport = resumePage.getViewport({ scale });
-      const ratio = window.devicePixelRatio || 1;
-
-      if (resumeRenderTask) resumeRenderTask.cancel();
-
-      resumeCanvas.width = Math.floor(viewport.width * ratio);
-      resumeCanvas.height = Math.floor(viewport.height * ratio);
-      resumeCanvas.style.width = Math.floor(viewport.width) + 'px';
-      resumeCanvas.style.height = Math.floor(viewport.height) + 'px';
-
-      resumeRenderTask = resumePage.render({
-        canvasContext: resumeCanvas.getContext('2d', { alpha: false }),
-        viewport,
-        transform: ratio !== 1 ? [ratio, 0, 0, ratio, 0, 0] : null
-      });
-      await resumeRenderTask.promise;
-    } catch (error) {
-      if (error?.name !== 'RenderingCancelledException') {
-        console.error('Resume preview failed:', error);
-      }
-    }
-  };
-
   document.querySelectorAll('[data-resume]').forEach((button) => {
-    button.addEventListener('click', () => {
-      modal.showModal();
-      requestAnimationFrame(() => renderResume());
-    });
+    button.addEventListener('click', () => modal.showModal());
   });
 
   modal.querySelector('.close')?.addEventListener('click', () => modal.close());
+
   modal.addEventListener('click', (event) => {
     if (event.target === modal) modal.close();
-  });
-
-  window.addEventListener('resize', () => {
-    if (modal.open) requestAnimationFrame(() => renderResume());
   });
 }
 
